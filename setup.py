@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="aek-lregr-trainer",  # Paket adı (PyPI’de benzersiz olmalı)
-    version="0.1.0",
+    name="aek-lregr-trainer",  
+    version="0.1.1",
     author="Alp Emre Karaahmet",
-    author_email="alpemrekaraahmet@gmail.com",  # kendi mailini yaz
+    author_email="alpemrekaraahmet@gmail.com",  
     description="Automatic ANN/DNN Linear Regression and Classification Trainer",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/alpemre8/aek-lregr-trainer",  # GitHub repo linki
+    url="https://github.com/alpemre8/aek-lregr-trainer", 
     packages=find_packages(),
     python_requires=">=3.8",
     install_requires=[
