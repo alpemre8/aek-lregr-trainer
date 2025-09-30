@@ -46,7 +46,7 @@ class ClassificationTrainer:
                 loss = self.criterion(outputs, yb)
                 loss.backward()
                 self.optimizer.step()
-                total_loss += loss.item()
+                total_train_loss += loss.item()
 
                 preds = torch.argmax(outputs, dim=1)
                 all_train_preds.append(preds)

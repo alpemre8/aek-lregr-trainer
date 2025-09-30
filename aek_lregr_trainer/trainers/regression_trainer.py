@@ -35,14 +35,14 @@ class RegressionTrainer:
         
         for epoch in range(self.epochs):
             self.model.train()
-            total_loss = 0
+            total_train_loss = 0
             for xb, yb in train_loader:
                 self.optimizer.zero_grad()
                 outputs = self.model(xb)
                 loss = self.criterion(outputs, yb)
                 loss.backward()
                 self.optimizer.step()
-                total_loss += loss.item()
+                total_train_loss += loss.item()
 
             self.model.eval()
             total_val_loss = 0
@@ -52,7 +52,7 @@ class RegressionTrainer:
                     loss = self.criterion(outputs, yb)
                     total_val_loss += loss.item()
             self.model.train()
-            print(f"epoch {epoch+1}/{self.epochs} | train loss: {total_loss/len(train_loader):.4f} | val loss: {total_val_loss/len(val_loader):.4f}")
+            print(f"epoch {epoch+1}/{self.epochs} | train loss: {total_train_loss/len(train_loader):.4f} | val loss: {total_val_loss/len(val_loader):.4f}")
 
 
     def train2(self, csv_path, label_column):
