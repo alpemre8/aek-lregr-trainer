@@ -38,6 +38,12 @@ class ClassificationTrainer:
                 self.optimizer.step()
                 total_loss += loss.item()
             print(f"epoch {epoch+1}/{self.epochs}, loss: {total_loss/len(loader):.4f}")
+    
+    def train2(self, csv_path, label_column):
+        from ..utils.preprocessing import load_csv
+
+        X, y = load_csv(csv_path, label_column, as_tensor=True, task="classification")
+        self.train(X, y)
 
     def predict(self, X):
         self.model.eval()
