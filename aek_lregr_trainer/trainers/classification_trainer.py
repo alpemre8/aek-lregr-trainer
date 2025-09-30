@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from ..models.ann import ANN
+from sklearn.model_selection import train_test_split
 from ..utils.preprocessing import to_tensor
 from ..utils.metrics import accuracy_score
 
@@ -20,25 +21,55 @@ class ClassificationTrainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
 
     
-    def train(self, X, y):
+    def train(self, X, y, test_size=0.2, random_state=None):
         X = to_tensor(X).to(self.device)
         y = torch.tensor(y, dtype=torch.long).to(self.device)
 
-        dataset = torch.utils.data.TensorDataset(X, y)
-        loader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
-        self.model.train()
+        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    
+        train_dataset = torch.utils.data.TensorDataset(X_train, y_train)
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
+        
+        val_dataset = torch.utils.data.TensorDataset(X_val, y_val)
+        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
+        
+        
+
 
         for epoch in range(self.epochs):
-            total_loss = 0
-            for xb, yb in loader:
+            self.model.train()
+            total_train_loss = 0
+            all_train_preds, all_train_labels = [], []
+            for xb, yb in train_loader:
                 self.optimizer.zero_grad()
                 outputs = self.model(xb)
                 loss = self.criterion(outputs, yb)
                 loss.backward()
                 self.optimizer.step()
                 total_loss += loss.item()
-            print(f"epoch {epoch+1}/{self.epochs}, loss: {total_loss/len(loader):.4f}")
-    
+
+                preds = torch.argmax(outputs, dim=1)
+                all_train_preds.append(preds)
+                all_train_labels.append(yb)
+            train_acc = accuracy_score(torch.cat(all_train_labels).cpu(), torch.cat(all_train_preds).cpu())
+
+            self.model.eval()
+            total_val_loss = 0
+            all_val_preds, all_val_labels = [], []
+            with torch.no_grad():
+                for xb, yb in val_loader:
+                    outputs = self.model(xb)
+                    loss = self.criterion(outputs, yb)
+                    total_val_loss += loss.item()
+
+                    preds = torch.argmax(outputs, dim=1)
+                    all_val_preds.append(preds)
+                    all_val_labels.append(yb)
+            val_acc = accuracy_score(torch.cat(all_val_labels).cpu(), torch.cat(all_val_preds).cpu())
+            self.model.train()
+            print(f"epoch {epoch+1}/{self.epochs} | train loss: {total_train_loss/len(train_loader):.4f} | train acc: {train_acc:.4f} | val loss: {total_val_loss/len(val_loader):.4f} | val acc: {val_acc:.4f}")
+
+
     def train2(self, csv_path, label_column):
         from ..utils.preprocessing import load_csv
 
