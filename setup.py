@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="aek-lregr-trainer",  
-    version="0.2.0",
+    version="0.3.0",
     author="Alp Emre Karaahmet",
     author_email="alpemrekaraahmet@gmail.com",  
     description="Automatic ANN/DNN Linear Regression and Classification Trainer",
